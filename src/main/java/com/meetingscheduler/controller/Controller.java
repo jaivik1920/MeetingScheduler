@@ -89,11 +89,13 @@ public class Controller {
 			for(Meeting meeting2:meetings) {
 				String s1=meeting2.getMeetingdate().toString();
 				String s2=meeting.getMeetingdate().toString();
+				if(meeting.getId()!=meeting2.getId()) {
 				if((meeting.getStarttime().compareTo(meeting2.getStarttime())==0 && s1.equals(s2)) ||
 				 (meeting.getStarttime().compareTo(meeting2.getStarttime())<0 && meeting.getEndtime().compareTo(meeting2.getStarttime())>0 && s1.equals(s2))||
 				 (meeting.getStarttime().compareTo(meeting2.getStarttime())>0 && meeting.getStarttime().compareTo(meeting2.getEndtime())<0  && s1.equals(s2))) {
 					return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
 				}
+			}
 			}
 			Meeting meeting2=meetingrepo.save(meeting);
 			return ResponseEntity.of(Optional.of(meeting2));
