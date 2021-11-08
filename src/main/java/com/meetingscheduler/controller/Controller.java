@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.meetingscheduler.emailService.EmailService;
 import com.meetingscheduler.entity.Meeting;
 import com.meetingscheduler.entity.User;
 import com.meetingscheduler.repository.MeetingRepository;
@@ -25,6 +26,9 @@ public class Controller {
 	
 	@Autowired
 	private MeetingRepository meetingrepo;
+	
+	@Autowired
+	private EmailService emailservice;
 	
 	@GetMapping("/test")
 	public User test() {
@@ -53,6 +57,21 @@ public class Controller {
 			}
 		}
 		Meeting meeting2=meetingrepo.save(meeting);
+		
+		
+		String ary[]=meeting2.getAttandeeUserEmails().split(",");
+		
+		String cont="Dear Friend, <strong>"+meeting2.getHostUserEmail() +"</strong> schedule meeting with you at "+meeting2.getStarttime()+" to "+meeting2.getEndtime()+"<br> Please join using below link. Happy coding!!!<br><strong>" +meeting2.getMeetinglink() +"</strong><br>Thanks for your Support.<br><br> From <br><strong>Meetingscheduler!!!</strong>";
+		
+		
+		for(String emailString:ary) {
+			emailservice.sendEmail(meeting2.getMeetingtitle(), cont, emailString);
+		}
+		
+		String cont2="Dear <strong>"+meeting2.getHostUserEmail() +"</strong> you schedule meeting with you at "+meeting2.getStarttime()+" to "+meeting2.getEndtime()+"<br> Please join using below link. Happy coding!!!<br><strong>" +meeting2.getMeetinglink() +"</strong><br>Thanks for your Support.<br><br> From <br><strong>Meetingscheduler!!!</strong>";
+
+		emailservice.sendEmail(meeting2.getMeetingtitle(), cont2, meeting2.getHostUserEmail());
+		
 		return ResponseEntity.of(Optional.of(meeting2));
 		}
 		catch (Exception e) {
@@ -98,6 +117,20 @@ public class Controller {
 			}
 			}
 			Meeting meeting2=meetingrepo.save(meeting);
+			
+			String ary[]=meeting2.getAttandeeUserEmails().split(",");
+			
+			String cont="Dear Friend, <strong>"+meeting2.getHostUserEmail() +"</strong> schanged meeting details. "+meeting2.getStarttime()+" to "+meeting2.getEndtime()+"<br> Please join using below link. Happy coding!!!<br><strong>" +meeting2.getMeetinglink() +"</strong><br>Thanks for your Support.<br><br> From <br><strong>Meetingscheduler!!!</strong>";
+			
+			
+			for(String emailString:ary) {
+				emailservice.sendEmail(meeting2.getMeetingtitle()+"Updated", cont, emailString);
+			}
+			
+			String cont2="Dear <strong>"+meeting2.getHostUserEmail() +"</strong> you changed meeting details."+meeting2.getStarttime()+" to "+meeting2.getEndtime()+"<br> Please join using below link. Happy coding!!!<br><strong>" +meeting2.getMeetinglink() +"</strong><br>Thanks for your Support.<br><br> From <br><strong>Meetingscheduler!!!</strong>";
+
+			emailservice.sendEmail(meeting2.getMeetingtitle()+"Updated", cont2, meeting2.getHostUserEmail());
+			
 			return ResponseEntity.of(Optional.of(meeting2));
 			
 		} catch (Exception e) {
